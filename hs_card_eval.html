@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>하스스톤 카드 평가표</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --gold:#C47B2A;--gold-l:#E8A84A;
+  --bg:#1A1208;--bg2:#221A0D;--bg3:#2C2010;
+  --sf:#2E2213;--sf2:#3A2C18;
+  --bd:rgba(196,123,42,0.22);--bd2:rgba(196,123,42,0.48);
+  --tx:#F0E6D0;--tx2:#A89070;--tx3:#6E5A40;
+  --r:8px;--rl:12px;
+}
+body{background:var(--bg);color:var(--tx);font-family:'Noto Sans KR',sans-serif;min-height:100vh;}
+
+/* ── HEADER ── */
+.hdr{background:var(--bg2);border-bottom:1px solid var(--bd2);padding:0 20px;display:flex;align-items:center;gap:12px;height:50px;position:sticky;top:0;z-index:300;}
+.logo-ic{width:28px;height:28px;background:linear-gradient(135deg,var(--gold),#8B5A1A);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.logo-tx{font-size:15px;font-weight:700;}
+.hd-sp{flex:1;}
+.hd-btn{display:flex;align-items:center;gap:5px;height:29px;padding:0 11px;border-radius:var(--r);font-size:12px;font-weight:500;cursor:pointer;border:1px solid;font-family:'Noto Sans KR',sans-serif;}
+.hd-btn:hover{opacity:.75;}
+.b-xl{background:#182F18;color:#7DC87D;border-color:#265226;}
+.b-pdf{background:#311111;color:#E87A7A;border-color:#4A1A1A;}
+
+/* ── LAYOUT ── */
+.layout{display:flex;min-height:calc(100vh - 50px);}
+
+/* ── SIDEBAR ── */
+.sidebar{width:178px;min-width:178px;background:var(--bg2);border-right:1px solid var(--bd);padding:10px 0;position:sticky;top:50px;height:calc(100vh - 50px);overflow-y:auto;flex-shrink:0;}
+.sb-lbl{font-size:9px;font-weight:700;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;padding:0 13px 5px;}
+.sb-btn{display:flex;align-items:center;gap:7px;width:100%;padding:7px 13px;background:none;border:none;cursor:pointer;color:var(--tx2);font-size:12px;font-weight:500;text-align:left;font-family:'Noto Sans KR',sans-serif;transition:background .1s,color .1s;}
+.sb-btn:hover{background:var(--sf);color:var(--tx);}
+.sb-btn.active{background:var(--sf2);color:var(--gold-l);}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.sb-cnt{margin-left:auto;font-size:10px;color:var(--tx3);background:var(--bg3);border-radius:10px;padding:1px 6px;}
+.sb-div{height:1px;background:var(--bd);margin:5px 0;}
+
+/* ── MAIN ── */
+.main{flex:1;padding:14px 18px;min-width:0;}
+
+/* ── EXPANSION BAR ── */
+.exp-bar{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:12px 14px;margin-bottom:12px;}
+.exp-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.exp-title{font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.8px;text-transform:uppercase;}
+.exp-search-inp{height:28px;padding:0 10px;background:var(--bg3);border:1px solid var(--bd);border-radius:20px;color:var(--tx);font-size:12px;font-family:'Noto Sans KR',sans-serif;width:160px;}
+.exp-search-inp:focus{outline:none;border-color:var(--gold);}
+.exp-search-inp::placeholder{color:var(--tx3);}
+.exp-sel-lbl{font-size:12px;color:var(--gold-l);font-weight:500;margin-left:auto;}
+.exp-clear-btn{height:24px;padding:0 8px;border:1px solid var(--bd2);border-radius:12px;background:none;color:var(--tx3);font-size:11px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.exp-clear-btn:hover{color:#E87A7A;}
+.exp-grid{display:flex;flex-wrap:wrap;gap:5px;max-height:130px;overflow-y:auto;}
+.exp-chip{padding:4px 11px;border-radius:16px;border:1px solid var(--bd);background:var(--bg3);color:var(--tx2);font-size:11px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;white-space:nowrap;line-height:1.4;}
+.exp-chip:hover{border-color:var(--bd2);color:var(--tx);}
+.exp-chip.active{background:var(--gold);border-color:var(--gold);color:#fff;}
+.exp-status{font-size:12px;color:var(--tx3);padding:6px 0;}
+
+/* ── EVAL BAR ── */
+.eval-bar{display:flex;align-items:center;gap:7px;margin-bottom:12px;flex-wrap:wrap;}
+.eval-lbl{font-size:11px;color:var(--tx3);flex-shrink:0;}
+.eval-chip{display:inline-flex;align-items:center;gap:0;padding:0;background:var(--sf2);border:1px solid var(--bd);border-radius:16px;font-size:11px;overflow:hidden;}
+.eval-chip-name{padding:3px 6px;color:var(--tx);cursor:text;width:52px;outline:none;border:none;background:transparent;font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:500;}
+.eval-chip-name:focus{background:var(--bg2);color:var(--gold-l);width:80px;}
+.eval-chip-rm{background:none;border:none;border-left:1px solid var(--bd);cursor:pointer;color:var(--tx3);font-size:13px;padding:3px 7px;line-height:1;font-family:inherit;transition:color .1s;}
+.eval-chip-rm:hover{color:#E87A7A;}
+.eval-add{display:flex;align-items:center;gap:3px;height:26px;padding:0 10px;border:1px dashed var(--bd2);border-radius:16px;background:none;color:var(--tx3);font-size:11px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;}
+.eval-add:hover{border-color:var(--gold);color:var(--gold-l);}
+
+/* ── CLASS SECTION ── */
+.cls-sec{margin-bottom:24px;}
+.cls-hdr{display:flex;align-items:center;gap:7px;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid var(--bd);}
+.cls-dot{width:8px;height:8px;border-radius:50%;}
+.cls-name{font-size:13px;font-weight:700;}
+.cls-cnt{font-size:11px;color:var(--tx3);}
+
+/* ── CARD GRID ── */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;}
+
+/* ── CARD ITEM ── */
+.card-item{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);overflow:visible;display:flex;flex-direction:column;}
+.card-img-wrap{background:var(--bg3);display:flex;align-items:center;justify-content:center;padding:6px 6px 2px;border-radius:var(--rl) var(--rl) 0 0;overflow:hidden;}
+.card-img-wrap img{width:100%;max-width:188px;height:auto;display:block;margin:0 auto;}
+.card-img-placeholder{width:188px;height:258px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--tx3);font-size:10px;}
+.card-img-placeholder .ph-ic{font-size:26px;}
+.card-title-bar{padding:4px 8px 5px;background:var(--bg3);border-top:1px solid var(--bd);display:flex;align-items:center;gap:5px;}
+.card-cost{flex-shrink:0;width:18px;height:18px;background:#5070C0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;line-height:1;}
+.card-title{font-size:11px;font-weight:500;color:var(--tx2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* ── EVAL 세로 블록 ── */
+.card-evals{border-top:1px solid var(--bd);display:flex;flex-direction:column;}
+.ev-block{border-bottom:1px solid rgba(196,123,42,0.12);}
+.ev-block:last-child{border-bottom:none;}
+.ev-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid rgba(196,123,42,0.08);}
+.ev-name{padding:5px 7px;font-size:11px;font-weight:600;color:var(--tx);border-right:1px solid rgba(196,123,42,0.1);display:flex;align-items:center;}
+/* ── 커스텀 등급 드롭다운 ── */
+.ev-grade{padding:4px 6px;display:flex;align-items:center;position:relative;z-index:10;}
+.grade-btn{width:100%;height:26px;padding:0 8px 0 6px;border-radius:5px;border:none;cursor:pointer;font-size:11px;font-weight:600;color:#fff;font-family:'Noto Sans KR',sans-serif;display:flex;align-items:center;justify-content:space-between;gap:4px;white-space:nowrap;}
+.grade-판도  {background:#C47B2A;}
+.grade-좋음  {background:#2A7A3A;}
+.grade-가능성{background:#2A5AA0;}
+.grade-가루  {background:#505050;}
+.grade-dropdown{position:fixed;z-index:9999;background:var(--bg2);border:1px solid var(--bd2);border-radius:6px;overflow:hidden;min-width:88px;display:none;box-shadow:0 6px 16px rgba(0,0,0,.7);}
+.grade-dropdown.open{display:block;}
+.grade-opt{padding:6px 10px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.grade-opt:hover{filter:brightness(1.25);}
+.grade-opt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:#fff;opacity:.6;}
+.ev-comment{padding:4px 7px 6px;}
+.cmt-inp{width:100%;padding:5px 7px;background:var(--bg3);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-size:11px;font-family:'Noto Sans KR',sans-serif;resize:vertical;min-height:52px;line-height:1.5;transition:border-color .15s;}
+.cmt-inp:focus{outline:none;border-color:var(--gold);}
+.cmt-inp::placeholder{color:var(--tx3);}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:50px 20px;color:var(--tx3);font-size:13px;}
+.empty-ic{font-size:32px;display:block;margin-bottom:8px;}
+
+/* ── MODAL ── */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:999;}
+.modal{background:var(--sf);border:1px solid var(--bd2);border-radius:var(--rl);padding:20px;width:280px;}
+.modal h2{font-size:13px;font-weight:700;margin-bottom:11px;}
+.modal input{width:100%;height:32px;padding:0 10px;background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--r);color:var(--tx);font-size:13px;font-family:'Noto Sans KR',sans-serif;margin-bottom:12px;}
+.modal input:focus{outline:none;border-color:var(--gold);}
+.modal-btns{display:flex;gap:7px;justify-content:flex-end;}
+.modal-btns button{height:29px;padding:0 13px;border-radius:var(--r);font-size:12px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.m-cancel{background:var(--bg3);border:1px solid var(--bd);color:var(--tx2);}
+.m-ok{background:var(--gold);border:none;color:#fff;}
+
+/* CLASS COLORS */
+.cc-dk{background:#4A8FA8;}.ct-dk{color:#4A8FA8;}
+.cc-dh{background:#C86432;}.ct-dh{color:#C86432;}
+.cc-druid{background:#A07040;}.ct-druid{color:#A07040;}
+.cc-hunter{background:#4A8A2A;}.ct-hunter{color:#5AAA35;}
+.cc-mage{background:#5070C0;}.ct-mage{color:#7090E0;}
+.cc-paladin{background:#C8A820;}.ct-paladin{color:#D4B830;}
+.cc-priest{background:#909090;}.ct-priest{color:#B8B8B8;}
+.cc-rogue{background:#505050;}.ct-rogue{color:#909090;}
+.cc-shaman{background:#4060B0;}.ct-shaman{color:#6080CC;}
+.cc-warlock{background:#7040A0;}.ct-warlock{color:#A060CC;}
+.cc-warrior{background:#A03020;}.ct-warrior{color:#CC5040;}
+.cc-neutral{background:#606060;}.ct-neutral{color:#909090;}
+
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px;}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="logo-ic">HS</div>
+  <span class="logo-tx">카드 평가표</span>
+  <div class="hd-sp"></div>
+  <button class="hd-btn b-xl" onclick="exportExcel()">📊 엑셀 저장</button>
+  <button class="hd-btn b-pdf" onclick="exportPDF()">📄 PDF 저장</button>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sb-lbl">보기</div>
+    <button class="sb-btn active" onclick="setFilter('all',this)">
+      <span class="sb-dot" style="background:#888"></span>전체 보기
+      <span class="sb-cnt" id="cnt-all">0</span>
+    </button>
+    <div class="sb-div"></div>
+    <div class="sb-lbl">직업별 보기</div>
+    <div id="classBtns"></div>
+  </nav>
+
+  <main class="main">
+    <div class="exp-bar">
+      <div class="exp-top">
+        <span class="exp-title">확장팩 선택</span>
+        <span class="exp-sel-lbl" id="expSelLbl"></span>
+        <button class="exp-clear-btn" id="expClearBtn" style="display:none" onclick="clearSet()">✕ 초기화</button>
+      </div>
+      <div class="exp-grid" id="expGrid">
+        <span class="exp-status" id="expStatus">카드 데이터 불러오는 중…</span>
+      </div>
+    </div>
+
+    <div class="eval-bar">
+      <span class="eval-lbl">평가자:</span>
+      <div id="evalChips"></div>
+      <button class="eval-add" onclick="openModal()">+ 추가</button>
+    </div>
+
+    <div id="cardsArea"></div>
+  </main>
+</div>
+
+<div class="modal-ov" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h2>평가자 추가</h2>
+    <input type="text" id="evalInput" placeholder="이름 입력"/>
+    <div class="modal-btns">
+      <button class="m-cancel" onclick="closeModal()">취소</button>
+      <button class="m-ok" onclick="confirmEval()">추가</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── 상수 ──────────────────────────────────────────────────────
+const CLASS_ORDER = [
+  {key:'DEATHKNIGHT', label:'죽음의 기사', cc:'cc-dk',      ct:'ct-dk'},
+  {key:'DEMONHUNTER', label:'악마사냥꾼',  cc:'cc-dh',      ct:'ct-dh'},
+  {key:'DRUID',       label:'드루이드',    cc:'cc-druid',   ct:'ct-druid'},
+  {key:'HUNTER',      label:'사냥꾼',      cc:'cc-hunter',  ct:'ct-hunter'},
+  {key:'MAGE',        label:'마법사',      cc:'cc-mage',    ct:'ct-mage'},
+  {key:'PALADIN',     label:'성기사',      cc:'cc-paladin', ct:'ct-paladin'},
+  {key:'PRIEST',      label:'사제',        cc:'cc-priest',  ct:'ct-priest'},
+  {key:'ROGUE',       label:'도적',        cc:'cc-rogue',   ct:'ct-rogue'},
+  {key:'SHAMAN',      label:'주술사',      cc:'cc-shaman',  ct:'ct-shaman'},
+  {key:'WARLOCK',     label:'흑마법사',    cc:'cc-warlock', ct:'ct-warlock'},
+  {key:'WARRIOR',     label:'전사',        cc:'cc-warrior', ct:'ct-warrior'},
+  {key:'NEUTRAL',     label:'중립',        cc:'cc-neutral', ct:'ct-neutral'},
+];
+const GRADES = ['판도','좋음','가능성','가루'];
+
+// ── 확장팩 목록 (블리자드 공식 API slug 기준, 확인 완료) ──────
+const TARGET_EXPANSIONS = [
+  { id: 'VIOLET_HOLD',  ko: '보라빛 요새 탈출',       slug: 'escape-from-violet-hold'     },
+  { id: 'CATACLYSM',    ko: '대격변',                  slug: 'cataclysm'                   },
+  { id: 'TIME_TRAVEL',  ko: '시간의 길 너머로',        slug: 'across-the-timeways'         },
+  { id: 'THE_LOST_CITY',ko: '운고로의 잃어버린 도시',  slug: 'the-lost-city-of-ungoro'     },
+  { id: 'EMERALD_DREAM',ko: '에메랄드의 꿈',           slug: 'into-the-emerald-dream'      },
+  { id: 'BLACK_EMPIRE', ko: '검은 제국의 지배',        slug: 'reign-of-the-black-empire'   },
+];
+
+// 보라빛 요새 카드 ID → classId 직접 매핑 (API 실측값)
+const VH_CLASS_MAP = {"123995":12,"124003":12,"124073":9,"124075":7,"124079":6,"124080":6,"124150":12,"125462":5,"125571":7,"125643":12,"125660":5,"125803":10,"125878":9,"125893":10,"125914":12,"125915":9,"125917":9,"125918":12,"125934":3,"125983":7,"125985":7,"125986":12,"125988":7,"125989":7,"125993":2,"125996":3,"125998":3,"126002":10,"126045":2,"126054":2,"126055":6,"126092":12,"126094":10,"126098":7,"126100":10,"126104":10,"126109":4,"126111":4,"126113":4,"126116":4,"126122":6,"126124":6,"126125":9,"126127":6,"126128":9,"126129":9,"126135":9,"126136":10,"126180":2,"126205":2,"126210":12,"126211":14,"126221":7,"126222":14,"126225":2,"126243":2,"126252":1,"126253":4,"126254":1,"126255":1,"126259":1,"126260":1,"126261":1,"126294":3,"126295":3,"126299":3,"126353":4,"126354":4,"126355":4,"126356":4,"126365":1,"126407":8,"126409":8,"126410":8,"126413":8,"126415":8,"126416":8,"126419":3,"126422":3,"126423":3,"126425":3,"126472":12,"126477":9,"126478":9,"126479":12,"126482":6,"126497":12,"126502":1,"126503":1,"126597":10,"126598":10,"126600":12,"126602":12,"126604":12,"126616":5,"126617":5,"126618":5,"126619":5,"126620":5,"126621":5,"126627":8,"126652":5,"126660":14,"126662":14,"126663":14,"126664":14,"126666":12,"126841":4,"126867":6,"126874":12,"126896":6,"126898":6,"126911":1,"126937":12,"126938":8,"127155":14,"127157":14,"127159":14,"127260":10,"127319":5,"127322":12,"127688":8,"127711":8,"127815":2,"127932":2,"127946":2,"127994":12,"127996":12,"128004":12,"128019":14,"128052":12,"128053":12,"129983":7,"130021":7,"131316":12};
+
+// classId → 직업 (API 직접 확인 완료)
+// druid=2, hunter=3, mage=4, paladin=5, priest=6, rogue=7, shaman=8, warlock=9, warrior=10
+// deathknight=1, demonhunter=14, neutral=12
+const VH_CLASSID_TO_CLASS = {
+  1:  'DEATHKNIGHT',
+  2:  'DRUID',
+  3:  'HUNTER',
+  4:  'MAGE',
+  5:  'PALADIN',
+  6:  'PRIEST',
+  7:  'ROGUE',
+  8:  'SHAMAN',
+  9:  'WARLOCK',
+  10: 'WARRIOR',
+  12: 'NEUTRAL',
+  14: 'DEMONHUNTER',
+};
+function classIdToKey(classId, multiClassIds) {
+  const id = (multiClassIds?.length) ? multiClassIds[0] : classId;
+  return VH_CLASSID_TO_CLASS[id] || 'NEUTRAL';
+}
+
+// ── 보라빛 요새 탈출 카드 데이터 (하드코딩, 2026-06-27 기준 135장) ──
+const VH_CARDS_RAW = [{"id":"127932","name":"비밀 재료","cost":0,"classId":2},{"id":"126409","name":"갤라지오 청부사","cost":1,"classId":8},{"id":"126662","name":"공허의 영혼","cost":1,"classId":14},{"id":"126116","name":"만능 열쇠","cost":1,"classId":4},{"id":"126356","name":"매서운 한파","cost":1,"classId":4},{"id":"125996","name":"밀반입된 삽","cost":1,"classId":3},{"id":"126255","name":"변장한 의사","cost":1,"classId":1},{"id":"126627","name":"변장한 탐정","cost":1,"classId":8},{"id":"126938","name":"보안 미비 구역","cost":1,"classId":8},{"id":"126867","name":"불사형 선고","cost":1,"classId":6},{"id":"127946","name":"새끼거미","cost":1,"classId":2},{"id":"126422","name":"암시장 감독관","cost":1,"classId":3},{"id":"128004","name":"은폐용 과자","cost":1,"classId":12},{"id":"125985","name":"자물쇠 따기 전문가","cost":1,"classId":7},{"id":"126092","name":"잘 속는 경비병","cost":1,"classId":12},{"id":"125893","name":"장비 쟁탈","cost":1,"classId":10},{"id":"126597","name":"족쇄","cost":1,"classId":10},{"id":"126600","name":"감시관 마이에브","cost":2,"classId":12},{"id":"126225","name":"거미 기수","cost":2,"classId":2},{"id":"128019","name":"검은 뇌물","cost":2,"classId":14},{"id":"126299","name":"경비견","cost":2,"classId":3},{"id":"127157","name":"공허의 폭발","cost":2,"classId":14},{"id":"126180","name":"과부거미의 간식거리","cost":2,"classId":2},{"id":"126478","name":"그림자 탄환","cost":2,"classId":9},{"id":"125571","name":"납치","cost":2,"classId":7},{"id":"126937","name":"다급한 위조범","cost":2,"classId":12},{"id":"126295","name":"마법의 뒤안길 연결망","cost":2,"classId":3},{"id":"126109","name":"밀수품 마법봉","cost":2,"classId":4},{"id":"127260","name":"변장한 보초","cost":2,"classId":10},{"id":"126618","name":"붉은십자군 투사","cost":2,"classId":5},{"id":"126261","name":"뼈 질풍","cost":2,"classId":1},{"id":"126874","name":"사로잡힌 대마법사","cost":2,"classId":12},{"id":"127322","name":"소매치기","cost":2,"classId":12},{"id":"126502","name":"시체 대포","cost":2,"classId":1},{"id":"126652","name":"신성한 올가미!","cost":2,"classId":5},{"id":"126896","name":"신성한 포옹","cost":2,"classId":6},{"id":"125915","name":"악마 격리","cost":2,"classId":9},{"id":"126598","name":"야수들을 풀어라","cost":2,"classId":10},{"id":"126221","name":"연꽃 사서","cost":2,"classId":7},{"id":"127159","name":"우주의 현신","cost":2,"classId":14},{"id":"126054","name":"유독한 뇌물","cost":2,"classId":2},{"id":"126898","name":"절망의 망령","cost":2,"classId":6},{"id":"126122","name":"정신 삭제자","cost":2,"classId":6},{"id":"125643","name":"탈출의 명수","cost":2,"classId":12},{"id":"126254","name":"피 마시기","cost":2,"classId":1},{"id":"125660","name":"경계하는 파수꾼","cost":3,"classId":5},{"id":"125986","name":"경보로봇","cost":3,"classId":12},{"id":"126100","name":"군중 제어","cost":3,"classId":10},{"id":"126664","name":"난동꾼","cost":3,"classId":14},{"id":"126407","name":"녹아내린 황금","cost":3,"classId":8},{"id":"125914","name":"데피아즈단 밀수업자","cost":3,"classId":12},{"id":"126098","name":"도둑의 도구","cost":3,"classId":7},{"id":"128052","name":"변장한 집행자","cost":3,"classId":12},{"id":"124003","name":"보랏빛 응징자","cost":3,"classId":12},{"id":"125988","name":"블랙포우의 채찍","cost":3,"classId":7},{"id":"126423","name":"비전 철사덫","cost":3,"classId":3},{"id":"130021","name":"비취 수호자들","cost":3,"classId":7},{"id":"126127","name":"속박된 망령","cost":3,"classId":6},{"id":"126113","name":"신비한 눈속임","cost":3,"classId":4},{"id":"129983","name":"연꽃 골칫덩이","cost":3,"classId":7},{"id":"126045","name":"요리사 네스렉","cost":3,"classId":2},{"id":"125993","name":"원한의 주방장","cost":3,"classId":2},{"id":"125917","name":"임프 무리 앞잡이","cost":3,"classId":9},{"id":"126425","name":"쥐잡이","cost":3,"classId":3},{"id":"126617","name":"지원 오라","cost":3,"classId":5},{"id":"126135","name":"창살에 갇힌 두개골","cost":3,"classId":9},{"id":"126355","name":"첨탑 보안 요원","cost":3,"classId":4},{"id":"126205","name":"치명적인 조제법","cost":3,"classId":2},{"id":"126094","name":"폭도","cost":3,"classId":10},{"id":"126503","name":"피 복제","cost":3,"classId":1},{"id":"126663","name":"흉포한 공허비늘","cost":3,"classId":14},{"id":"126243","name":"계략의 지팡이","cost":4,"classId":2},{"id":"125878","name":"고대 점술가","cost":4,"classId":9},{"id":"126252","name":"구울의 탑","cost":4,"classId":1},{"id":"125803","name":"굽은니","cost":4,"classId":10},{"id":"126253","name":"까다로운 변통가","cost":4,"classId":4},{"id":"126620","name":"달라란 용사","cost":4,"classId":5},{"id":"124075","name":"데피아즈단 꿈나무","cost":4,"classId":7},{"id":"127815","name":"들끓는 주방","cost":4,"classId":2},{"id":"126479","name":"무모한 탐정","cost":4,"classId":12},{"id":"126125","name":"배신자 고드프리","cost":4,"classId":9},{"id":"126660","name":"별가루 낫","cost":4,"classId":14},{"id":"126419","name":"야수 철사덫","cost":4,"classId":3},{"id":"126211","name":"이리다 신시커","cost":4,"classId":14},{"id":"127711","name":"자그마한 친구","cost":4,"classId":8},{"id":"126294","name":"자유를 향해 파라","cost":4,"classId":3},{"id":"126602","name":"조사관 멀록 홈즈","cost":4,"classId":12},{"id":"131316","name":"쥐 강도","cost":4,"classId":12},{"id":"126104","name":"지저분한 수호자","cost":4,"classId":10},{"id":"127688","name":"탈취당한 경비로봇","cost":4,"classId":8},{"id":"126472","name":"활성화된 골렘","cost":4,"classId":12},{"id":"126666","name":"감옥새","cost":5,"classId":12},{"id":"126129","name":"고독의 봉우리","cost":5,"classId":9},{"id":"126353","name":"교도소 마나스톰","cost":5,"classId":4},{"id":"125983","name":"난도질","cost":5,"classId":7},{"id":"126410","name":"냉기분쇄","cost":5,"classId":8},{"id":"127994","name":"독방 수감자","cost":5,"classId":12},{"id":"126111","name":"불법 연금술사","cost":5,"classId":4},{"id":"127319","name":"붉은십자군 모집관","cost":5,"classId":5},{"id":"126621","name":"사령관 베아트릭스","cost":5,"classId":5},{"id":"126124","name":"영혼 속박 풀기","cost":5,"classId":6},{"id":"126911","name":"응급 수술","cost":5,"classId":1},{"id":"124080","name":"저지해라!","cost":5,"classId":6},{"id":"126497","name":"주라마트의 감옥","cost":5,"classId":12},{"id":"126354","name":"탈옥 설계사","cost":5,"classId":4},{"id":"128053","name":"탈출 전문 돼지운전사","cost":5,"classId":12},{"id":"126365","name":"피 의술사 탈레나","cost":5,"classId":1},{"id":"125934","name":"하수도 헤엄꾼","cost":5,"classId":3},{"id":"124150","name":"두목 바네사","cost":6,"classId":12},{"id":"125998","name":"마법의 뒤안길의 왕","cost":6,"classId":3},{"id":"126416","name":"머그지","cost":6,"classId":8},{"id":"126482","name":"부서진 자 카로브","cost":6,"classId":6},{"id":"126415","name":"사술사령관","cost":6,"classId":8},{"id":"126616","name":"심판","cost":6,"classId":5},{"id":"125989","name":"연꽃 두목 아이야","cost":6,"classId":7},{"id":"126222","name":"영혼 기생체 트라스타스","cost":6,"classId":14},{"id":"125918","name":"지옥불임프","cost":6,"classId":12},{"id":"126260","name":"톱뼈","cost":6,"classId":1},{"id":"123995","name":"하수도 임프","cost":6,"classId":12},{"id":"126136","name":"광란하는 사냥개","cost":7,"classId":10},{"id":"126841","name":"보랏빛 경보","cost":7,"classId":4},{"id":"126259","name":"살아 있는 역병","cost":7,"classId":1},{"id":"127996","name":"아라크나시드","cost":7,"classId":12},{"id":"126055","name":"영혼절단 아잘리나","cost":7,"classId":6},{"id":"124079","name":"예언자","cost":7,"classId":6},{"id":"126619","name":"진실 추적자","cost":7,"classId":5},{"id":"126413","name":"폭풍격노","cost":7,"classId":8},{"id":"126604","name":"밀수왕 토그왜글","cost":8,"classId":12},{"id":"126002","name":"사슬을 끊은 들창코","cost":8,"classId":10},{"id":"126128","name":"섬멸","cost":9,"classId":9},{"id":"126210","name":"암시장 경매인","cost":9,"classId":12},{"id":"125462","name":"임박한 죽음 브아마","cost":9,"classId":5},{"id":"124073","name":"모라그","cost":10,"classId":9},{"id":"126477","name":"보이지 않는 아틀라스","cost":10,"classId":9},{"id":"127155","name":"사로잡힌 나스레짐","cost":10,"classId":14}];
+
+// 이미지 URL 매핑 (블리자드 cloudfront)
+const VH_IMAGE_MAP = {"127932":"2d971236067849ba40ae454eb949e97253385d4420595628b000a67d63be9202","126409":"13d45909f30299c620a7c7fc4e327525a498d7d5f2b4f5923b70128ea2f247b9","126662":"3be6980bf931265118842caf19988b50441817782851b08b52be649b1eb0ea86","126116":"59e9955d4c3fa77a4c5b05eb0f38c95a29940727136bb3dd84668f938cbc3a01","126356":"7c7d0ca80677cf41cc6a8ec64eb79f70bf0fc85090a4fac75e97e8c0b9f0e028","125996":"85463506afb31499d7f48cb4175ffa61215f7c41810a987251e31362e272bd59","126255":"975bdfeb97761da44622c097fa080c7f7fde3393018c52d9e9ba76cb0a40ab83","126627":"050f5c21e14531ce0fa6bd5785805219d3371347dd8964a618ece8d0fc49f195","126938":"22223ca7a69d2601c680b82dc2f7d7db8b1da040a92243370a306bbedd80294d","126867":"da356f16933b2b5625629acfd20ebd9da1a3ab22ad842b29984eaa42e26d0d47","127946":"20edf8a72d5d581d97292371f689e6c29da869c4eb5580a666fcffbdd158c3a5","126422":"359dc87171c3594444ddf77a2e9eba283d4193ca30054129926b487625e23106","128004":"fa4666975b956b4dc57d7390e364d110aaf1ef8aef6067e731fbca2fe0342f91","125985":"191445522ec2b685fd175a7569dca4fd01e483db0d37731264577bbaab20a598","126092":"6383441d722a26c088c0945509e8245a671dba04cdc546fd8669c355a8164e82","125893":"543268f95b7cf0bf9021df23a5c355e69f0ce6e2688934527deb9c8dba1ef7fa","126597":"bcab768132f2df4f67742da4917123bd0474a70ad090dacc7a14350c178a7f44","126600":"d589dc4a4bb58b72a17c81996ea9b464efcc2c6aaa155eaeb8fbfae4f50a63a9","126225":"74c407628dbf6d1c39b0ca01c8ab3b8a33f96c8f49e12cb1de4cb39ec61997ba","128019":"5a22e27cfd19de821e73ce3080de0081b8873364e4980a7365c793454f629170","126299":"142e6b278e9445fa3d1f69bc470418b6a146fed6e554cd0fc91655f84c5acb33","127157":"49197f00fee375607aee2f26ec7caadbc6e95eb49daa12e7d9979003978bcdb9","126180":"41b8318503370cca6562fd933d4af5c91888ceba06f58f5bcebd25ff929c6896","126478":"6b8cea8716b97e9440b35cecbf23818f90195cb92a4257a2d1bd2a809da4a4a3","125571":"f0f9a62424f30b931cc900bef0a610312c7762ed2b8fcd81966239c15bd0345b","126937":"72ea8b0971b5737195940ed9e44fab988af2cc22f5985c4b1ffb281936fa3dfe","126295":"1d17101c3fca5977393c331ac2e250be918dd99f528ff98cda502bc782b0dcfc","126109":"978236f3ad37e352fcd3ae01e25ed4b24fdf11fc18df5e50d2f9112af36121f0","127260":"10bfa168a65d6da2a4ef4213fd9b4d2a4f72df252fa2e10412d75fc06139cd5a","126618":"07981e3d63a7218935195cff90d73d5c66e9a9d3dd3cb4b61b184cacb686619a","126261":"ea416b6b29239b2c3ecbb63e98371880d4fe8375d27cc425a1f05e3dd6f80a53","126874":"8b5b680e8b6063236e1c3ad2fe417ddb87db2be548ee15fbe1f502c8fca06ec7","127322":"6c4ba2a7e9f04f465fee7b83d4537ccb58bdbf6f083b3cf2ba1b398d23ce72b5","126502":"ef7a84d17a92e0cb941b1de4151ac36b43e81812e1208ac400bb03c9162f6680","126652":"5c808c3d96f5bb82784e173cc3c79da402ae6a0e7d1b246f04d7e5c7a314f2c4","126896":"fb8e2ceda21812fb3e7427b2e4a15dfcd23438c5d3d0df02bde765a8b1c8a33b","125915":"3a103732ee7ce91da01f92e57e40c6a5e20e761d51ba55b9a542c43038faef63","126598":"1621fa06fe02be7c10eb1aa0700aa481798ba5258b6083d4da55bb2c5ec612bd","126221":"97adbcd74c42de113c0b9347f09ebfea60e6b31e1378c46c04ad5eeb308d4656","127159":"f8c3f8d85d9e980ae8f1649a1e765cce557dc5ef8b79b79ef0a0ceb5109742de","126054":"68ea1b75b4fde273ab8a53b9e4a51e5d2e091946ade75fd3af178ef88b5b699c","126898":"f5f4af8d05e7e8c0f38cda07fb5cba7fb3dbab1a95cc59e99ae6d0a3a00a03df","126122":"f6fceb411f0fed8fb003ba738caed0708f49cdb7d8722f19e69e91488e8bc6e6","125643":"e3f7c8b0c8695b6dcac5a072fe1437bcf48de56bb8cf2ceeb403f74c7418e3de","126254":"4b757c25fe312f5afd32b6628bdd6f1a2031c42e524c46aaf16bc054efc61ea5","125660":"cc5b42db9cfeecbec90351b724ccf61632d6649d9a9891ab1ad43a12965e8a85","125986":"048b350fb758839dc9ec000f29225bc3b958e039d70c399989212ee28573520c","126100":"0604e7d10d1fad8c920c204a8a738eaa2a43dbf02cddcd90f9ea5f3d7fe27337","126664":"67b3f7b36946832da81fb745a4841789a5d19bb8f8a08e27fab61badf84603b5","126407":"7484429168a9611f6bfb673c499ad0542babdfad7b6fe3979984eca297369795","125914":"ac6a72e5f7e8a85676fa3d1072f9b179e767d2fd5d3b8aeaa6e44bab0cf8c617","126098":"526e02ff506ba741a0586e616190f6a3cb481ef1eebccc1f37bd9da0d6001fd9","128052":"cf83970435b43378d7e9f7c53ef2e7bf684815f9f6b25179694fcf4bc822c9e2","124003":"d8b6d3dc4f593404faddf73f82933b0d5672768c8af60a14c001853b9872c943","125988":"b1cdaed8d812b48b6a4eb2ccc386a7cd5344d27e8dca7416c0bfbd894a9e7308","126423":"8fcd85b057373c1117195bb8d2f488e060b3c90b9d2aeac7d9e2111acefafdcb","130021":"9f29a422f4dd88aa80b9c4af73f320d553493a1b5474d0edd24072b245f32514","126127":"d0655f3d15eda3ab40163d7e2a8bc69ef4f42989ca692316111400d5d89c8e88","126113":"25cbacebaf564992ab61d040a4cb9e36cb0fc66fa8ba22aac542080f57ef4c9c","129983":"d1773e59d75ae48fa511d1744a389f90a13f1ae39b51eb965702112366cc93c2","126045":"f92d4c8def01fff6762cdcf5d0e0966aba00f5118bf92f9e18fe813ba9893cf6","125993":"431b3c2f3919bc5eb9bc9f82cb8c170423608cd07aafb3f8b0680b9e7efceed1","125917":"d2150c88b135c48dd43f4daf96c873dd14c787cd836a11934269ae33cee9246c","126425":"abc3f4a6a5a5e30d9c205c72266288b5d25b0ae031507200153456299031a018","126617":"6a735b38b0a33fb253044be666d788577c6b42dece719ffbb00b73bc8c32d24d","126135":"c5d4bc7ced9a1fbd21d9b760d8f01cabdf8609f35a386b9e1c508b63c6ab82ae","126355":"cfb4498af1009ae6e6070e9d6f5d25466b2bdb21c223660a98ff5ad4345ab189","126205":"4c51201358c779b0188a43d0e7e601de18909eabbd0765f2b60fe455c13e7c20","126094":"94e68783c81c5b900f70f9e272bd0cc81d4bc434268ada43c39df8b9acd3c726","126503":"d4a5012d71259ed4e3a7ca8009fa4bca6909a5399e0d2f6d69953ee436e95e7a","126663":"811dd56089ace5972592649f9ffea777b489c4d5c3e016b28854c8c6e7b9d177","126243":"eff444d2b72cada94b92cad71eb0b7a0f783031e6cad0b06afb49c4b46d71bdc","125878":"d678a1a45a2e0389c0547d87dc73abf1e8165add889efaba3440ce696862000a","126252":"11976ced1d6d74b9ecdb7625234df960fb17dfc6d0ae75db16d4006cc7f0e9d8","125803":"acf588ba5a6874010a38e453b17a318c0dc66b064a917ac1572b000cff7ab1b2","126253":"6e03d2f59dcc28f1f3d1de48a93706acceb08c81c757fd77d2b9a68c2be094fc","126620":"addf3174a9a4bf3100f885b990df6ad257ca6c2bfebaee5bf6b13a90864ab7d3","124075":"08811b0a5fe9c1252fedbc540000e75ddf5ed7cce2568e9f2ecf875c67e8dce9","127815":"45d970691df481204c6fc96fb131bdcdc72fe92a89d8867bee143d025e5343e5","126479":"0651ffe5249f7eb9d58b5cfddbb0e9603e25928d7ac378d723c5ce1e03bb3e81","126125":"483d16ba85c3e3a9ebc3d440aa7cde20a8f9bd5a19a74f21220e740c33ccf983","126660":"cc837cfe7967f1cc899884c914c66bb9816b1d0b54c1aadee5291609f0189b90","126419":"b980042b4acfa221bad407801c7df78f8f50d604b172ed60f7bbde7b55f54027","126211":"06c2682a1b569eb13ee4f54aac1d78921887e9cc8ef08c4f1facfda5cefafb8c","127711":"735b6366047d67c201d04d8452be388c3c7aa377cda0defbeb4385182c0873ee","126294":"c4a64642d737675e915d90eab3e48f6aa3c419f5f16ff2fd8ac072ffc12b6235","126602":"c7376daa1e59b1f9114aa7bbea10b6d3dfac13c56adde26130773c111f40a686","131316":"c9a3de52b3bed60fe498839881e46acc1a7418263b0fa6693148e3cd05cefb91","126104":"5fbd10145eefff9b4f8e35126d81352e461d42504d6d18a9d0c9013f6747f976","127688":"436d433c2583a62ddeb1fdf069530dedb08ac2fc639d9c9c3af4eda8fd3e251a","126472":"e35bbf03a8703d20db99bad43db27905454dcc7b8cbea044c98c5b729c89a2d0","126666":"14428f7d1d5dc151a0b69fd872e9518c9172542d006f1626fd2978791a041ddd","126129":"c0f1eef9e667c823af03d5ab0993cd30561e0dddc4615967a7b849b70607544e","126353":"65485d2ffda3ad125c1e4e5248f3d70b371e8cad8d7f724b043647eeb343c71a","125983":"378e86fa5593c3e155a3e3df4c97b7646f7dfcc0302e32a64cdd07887cd45c07","126410":"77ce1c37118bada0f0548fcefd2282be32fe819a1f1f4181976937c7008fa52e","127994":"457df7129812d65c2a0812eefeb67131d5814d5fbf9975b1d583903492a345bf","126111":"8c139615aca4fcf80bfcffb66c15cab6d5fa9020cfe64ae4fbcfbffa494d0035","127319":"67f3baaef79b47b3d593bed33be17475b7b1b870058a030c24e4f115d7b35f4c","126621":"c30dec1d8e119737557f707c7102318671898e0416e35e6099d08037e862af64","126124":"a6c94a68799c231077e1754efa799023271850409136320fc6f9d760c1a5c5d6","126911":"982b46b84451fbacca1195feed816d1c6abf892d997d236bb1ffcdc3de060a35","124080":"f7269448f70256adec4ce212527d4d4a7e408f4425e4e94952c7423339918bd9","126497":"cd52d2f0ed8d1eb01cdc1167671a35f216fe9bca45c6c5eb5d275e78af195fa7","126354":"c465b82469f4bbdc5e8b661ca3ce0e098a21ac58cec9a27246301d97d17ade04","128053":"966fd5c592b611798e6a337b76878d8c09d521d07b9d073a96261ab2e142e0a4","126365":"2a8a654aee69f124ed58cee9b73d46fff1dbb2c525b57d0282ed4ecae4773afa","125934":"8b8ef672c01e8585ce19c8ca69296eaf6354be5d14e426c2f7cb44ae880567b5","124150":"fcc2ddc6b95bce6292b8b2e13566441b1e4721af877b18557147e8468971ecfa","125998":"479fb74ee79dcea6b08ead17246692cd6dba705b0073ce83d40b0d47d55c75f1","126416":"36515abc3419d21885b1426d2f4982845d9173a63226fc6eefea4a0865be5744","126482":"3845ae781b6ac6009e612d6927d03c39408ab14cc4d2fd0bb25c378c0a10f2b1","126415":"c7f76b38d934519b2b6abf4281a100eb2d9c78a19a2162cf46cc5094b3911552","126616":"a6fb2f431ad6bc4aec52d4aaf71779f98845820da3f3b3f54a07f7d7584471e3","125989":"9e42d00bab92811db5fc73292bd3f0b5cf8116e0bb2ab744c4de2c2841f84995","126222":"54b1a62026ec5de98d21cb5484ca19f3428f1ae49ed4924a542293b19b8f60ff","125918":"ef52b934c27ce71d399e903d21e93c5e60f4d6a81756f518e9764866aaae329f","126260":"006404a18a3c248fabdfcf89e80d21394c41001a3d3bd81b0cbae80ab91522b0","123995":"5ff77199df0b128354b4d3271b1a37ba8905ac495f6c92971a051377def66ec6","126136":"09abba0daafa0d1d6e9c20bf9f91f19989ceffc826735c2efde2814afc7cdf31","126841":"1e1ad9be45e7356f4d8673f4d7bbb9b4c16f0b65bf2a685a43fe5e282613356e","126259":"66cf1afc65d8735fbe612ed442be5ffa18745e76f7252af0835ad9ae8724f3c5","127996":"cc79da565133c92bef217676a399550d25783906ec5422d9bc627fa3c92c11fe","126055":"e76462ba16f7f36c45c62936a7870a671509216ecc34925767e117ec0dafda7a","124079":"affc4477301c6b51810d807ca604fc2ec2d50d6bfefb284f677878548ae6c431","126619":"5e7213391e1b43f1888cad7775436c59b5a247bb64403c4b693ed12ca34eb32e","126413":"07b26bdc52009cc3be49be73fdbcdd0922a791b51f6487e451964faeedbb3bc5","126604":"72bf65a7a6a5edfa564b88c26d2af3a3606f10f5af881fbad01023e190424edd","126002":"0573e74d34adf175ca66e15817c84880b699c0598b62d49f0404ec84cec80703","126128":"3a47f17145d63d5a0214be020e3901e677d6e5ee5d11b575fe931ab6886d0468","126210":"dc8bf4732b726b126121010f5e5d58555dc49b61f246599611e7a40c3c55a823","125462":"69c1c98f29e7f99b1972bbdd964434abf2e87ce51f98ca99f5cca5288e4bd328","124073":"c2ee3445263e5a8ced56a28256cdea69cae4fc5df9e0fb3f85afcc2b3e085bb1","126477":"3eb4c554b19c82a56bb9d70e50addc90f339bf7dc3d18f11ea503e3325cc5824","127155":"b6a007dc9242325a799239d7bb7cc2f44085c157fc307b322ab4704a9c180a0e"};
+
+const VH_BASE = 'https://d15f34w2p8l1cc.cloudfront.net/hearthstone/';
+
+// ── 검은 제국의 지배 카드 데이터 (하드코딩, 2026-10-04 기준 135장, 출시 전) ──
+// 카드 ID는 outof.games 기준, 마나 코스트는 공개 정보 기반
+// 한국어명은 출시 후 hearthstonejson API에서 자동 보완됨
+const BE_CARDS_RAW = [
+  // Death Knight (죽음의 기사)
+  {"id":"38599","name":"G'huun","cost":8,"cardClass":"DEATHKNIGHT"},
+  {"id":"38598","name":"Fetid Devourer","cost":7,"cardClass":"DEATHKNIGHT"},
+  {"id":"38593","name":"Bloodfiend","cost":4,"cardClass":"DEATHKNIGHT"},
+  {"id":"38588","name":"Uldir Quarantine","cost":3,"cardClass":"DEATHKNIGHT"},
+  {"id":"38660","name":"Xel'noth Behemoth","cost":5,"cardClass":"DEATHKNIGHT"},
+  {"id":"38345","name":"Fleshshape","cost":3,"cardClass":"DEATHKNIGHT"},
+  {"id":"38606","name":"Scion of Insight","cost":2,"cardClass":"DEATHKNIGHT"},
+  {"id":"38607","name":"The Cold Dark Void","cost":3,"cardClass":"DEATHKNIGHT"},
+  {"id":"38602","name":"Malicious Presence","cost":2,"cardClass":"DEATHKNIGHT"},
+  {"id":"38635","name":"Grafted Knight","cost":2,"cardClass":"DEATHKNIGHT"},
+  // Demon Hunter (악마 사냥꾼)
+  {"id":"38622","name":"Broodqueen Sha'kar","cost":5,"cardClass":"DEMONHUNTER"},
+  {"id":"38617","name":"Ravitz","cost":4,"cardClass":"DEMONHUNTER"},
+  {"id":"38626","name":"Encircle","cost":6,"cardClass":"DEMONHUNTER"},
+  {"id":"38586","name":"Tentacle Lash","cost":5,"cardClass":"DEMONHUNTER"},
+  {"id":"38632","name":"Terror of the Wastes","cost":5,"cardClass":"DEMONHUNTER"},
+  {"id":"38631","name":"Sigil of Hatching","cost":4,"cardClass":"DEMONHUNTER"},
+  {"id":"38616","name":"Blind Harrower","cost":3,"cardClass":"DEMONHUNTER"},
+  {"id":"38374","name":"Attentive Tender","cost":3,"cardClass":"DEMONHUNTER"},
+  {"id":"38629","name":"Hungering Cavern","cost":2,"cardClass":"DEMONHUNTER"},
+  {"id":"38634","name":"Wormriddled Wriggler","cost":1,"cardClass":"DEMONHUNTER"},
+  // Druid (드루이드)
+  {"id":"38648","name":"Ammunae","cost":8,"cardClass":"DRUID"},
+  {"id":"38712","name":"Freya, Emerald Architect","cost":6,"cardClass":"DRUID"},
+  {"id":"38709","name":"Curious Grimlynx","cost":5,"cardClass":"DRUID"},
+  {"id":"38651","name":"Deathblossom","cost":2,"cardClass":"DRUID"},
+  {"id":"38711","name":"Foraging Slyvern","cost":4,"cardClass":"DRUID"},
+  {"id":"38708","name":"Aetherial Kindling","cost":3,"cardClass":"DRUID"},
+  {"id":"38717","name":"Titan Sized","cost":2,"cardClass":"DRUID"},
+  {"id":"38714","name":"Primordial Bear","cost":3,"cardClass":"DRUID"},
+  {"id":"38716","name":"Steward of the Vale","cost":2,"cardClass":"DRUID"},
+  {"id":"38710","name":"Efflorescence","cost":2,"cardClass":"DRUID"},
+  // Hunter (사냥꾼)
+  {"id":"38719","name":"Kronn the Impaler","cost":10,"cardClass":"HUNTER"},
+  {"id":"38723","name":"Mimiron","cost":1,"cardClass":"HUNTER"},
+  {"id":"38729","name":"Reload","cost":8,"cardClass":"HUNTER"},
+  {"id":"38653","name":"Primal Rockfang","cost":3,"cardClass":"HUNTER"},
+  {"id":"38724","name":"Tank Regiment","cost":6,"cardClass":"HUNTER"},
+  {"id":"38728","name":"Bombardment","cost":5,"cardClass":"HUNTER"},
+  {"id":"38727","name":"Tinker","cost":2,"cardClass":"HUNTER"},
+  {"id":"38721","name":"Mechacycle","cost":4,"cardClass":"HUNTER"},
+  {"id":"38725","name":"Flamespitter","cost":3,"cardClass":"HUNTER"},
+  {"id":"38720","name":"Clockwork Boars","cost":2,"cardClass":"HUNTER"},
+  // Mage (마법사)
+  {"id":"38369","name":"Isiset","cost":7,"cardClass":"MAGE"},
+  {"id":"38685","name":"Discs of Norgannon","cost":2,"cardClass":"MAGE"},
+  {"id":"38589","name":"Icebelt Magi","cost":5,"cardClass":"MAGE"},
+  {"id":"38689","name":"Thaw From Ice","cost":2,"cardClass":"MAGE"},
+  {"id":"38680","name":"Astral Mediator","cost":5,"cardClass":"MAGE"},
+  {"id":"38686","name":"Foreboding Freeze","cost":3,"cardClass":"MAGE"},
+  {"id":"38683","name":"Constellar's Calling","cost":2,"cardClass":"MAGE"},
+  {"id":"38681","name":"Astral Rain","cost":4,"cardClass":"MAGE"},
+  {"id":"38684","name":"Cosmic Springs","cost":3,"cardClass":"MAGE"},
+  {"id":"38682","name":"Coilbearer","cost":2,"cardClass":"MAGE"},
+  // Paladin (성기사)
+  {"id":"38698","name":"Amitut, Keeper of Amitus","cost":7,"cardClass":"PALADIN"},
+  {"id":"38696","name":"Rajh","cost":5,"cardClass":"PALADIN"},
+  {"id":"38700","name":"Halls of Origination","cost":8,"cardClass":"PALADIN"},
+  {"id":"38703","name":"Oathbinder's Aura","cost":3,"cardClass":"PALADIN"},
+  {"id":"38705","name":"Sun's Reckoning","cost":2,"cardClass":"PALADIN"},
+  {"id":"38347","name":"Sandcrafter","cost":2,"cardClass":"PALADIN"},
+  {"id":"38702","name":"March to War","cost":1,"cardClass":"PALADIN"},
+  {"id":"38701","name":"Humble Judgment","cost":3,"cardClass":"PALADIN"},
+  {"id":"38693","name":"Lightcaller","cost":3,"cardClass":"PALADIN"},
+  {"id":"38706","name":"Sundancer","cost":2,"cardClass":"PALADIN"},
+  // Priest (사제)
+  {"id":"38618","name":"Zer'Ontu","cost":8,"cardClass":"PRIEST"},
+  {"id":"38621","name":"Blade of The Black Empire","cost":3,"cardClass":"PRIEST"},
+  {"id":"38346","name":"Mismatcher","cost":5,"cardClass":"PRIEST"},
+  {"id":"38583","name":"Dark Deacon","cost":3,"cardClass":"PRIEST"},
+  {"id":"38619","name":"Befuddled Summoner","cost":4,"cardClass":"PRIEST"},
+  {"id":"38624","name":"Elder Word: Foresight","cost":3,"cardClass":"PRIEST"},
+  {"id":"38620","name":"Servant of Zuramat","cost":1,"cardClass":"PRIEST"},
+  {"id":"38625","name":"Elder Word: Manifest","cost":5,"cardClass":"PRIEST"},
+  {"id":"38627","name":"Entropic Rift","cost":1,"cardClass":"PRIEST"},
+  {"id":"38623","name":"Elder Word: Flay","cost":1,"cardClass":"PRIEST"},
+  // Rogue (도적)
+  {"id":"38608","name":"The Unknowable One","cost":5,"cardClass":"ROGUE"},
+  {"id":"38375","name":"Drest'agath","cost":4,"cardClass":"ROGUE"},
+  {"id":"38615","name":"Wandering Seeker","cost":4,"cardClass":"ROGUE"},
+  {"id":"38613","name":"Shadowcrafter","cost":2,"cardClass":"ROGUE"},
+  {"id":"38590","name":"Aqir Goliath","cost":8,"cardClass":"ROGUE"},
+  {"id":"38647","name":"Agent of N'Zoth","cost":2,"cardClass":"ROGUE"},
+  {"id":"38601","name":"Incubate","cost":2,"cardClass":"ROGUE"},
+  {"id":"38591","name":"Aqir Swarmer","cost":3,"cardClass":"ROGUE"},
+  {"id":"38595","name":"Broodchamber Tunneler","cost":1,"cardClass":"ROGUE"},
+  {"id":"38612","name":"Shadow Dance","cost":0,"cardClass":"ROGUE"},
+  // Shaman (주술사)
+  {"id":"38641","name":"Neptulon, Lord of Tides","cost":7,"cardClass":"SHAMAN"},
+  {"id":"38644","name":"Therazane the Earthmother","cost":6,"cardClass":"SHAMAN"},
+  {"id":"38642","name":"Primus of Power","cost":4,"cardClass":"SHAMAN"},
+  {"id":"38646","name":"Unnatural Cold","cost":2,"cardClass":"SHAMAN"},
+  {"id":"38643","name":"Scorchfist Scholar","cost":5,"cardClass":"SHAMAN"},
+  {"id":"38638","name":"Elemental of Madness","cost":3,"cardClass":"SHAMAN"},
+  {"id":"38640","name":"Flame Shock","cost":1,"cardClass":"SHAMAN"},
+  {"id":"38587","name":"Watch Over","cost":6,"cardClass":"SHAMAN"},
+  {"id":"38639","name":"Eyemaul","cost":4,"cardClass":"SHAMAN"},
+  {"id":"38348","name":"Shadow Sculpt","cost":3,"cardClass":"SHAMAN"},
+  // Warlock (흑마법사)
+  {"id":"38652","name":"Kith'ix","cost":6,"cardClass":"WARLOCK"},
+  {"id":"38667","name":"Zakajz the Corruptor","cost":4,"cardClass":"WARLOCK"},
+  {"id":"38655","name":"Ritual of Excess","cost":3,"cardClass":"WARLOCK"},
+  {"id":"38663","name":"Floating Lessons","cost":1,"cardClass":"WARLOCK"},
+  {"id":"38661","name":"Blasphemy","cost":4,"cardClass":"WARLOCK"},
+  {"id":"38664","name":"Mawman Cultist","cost":3,"cardClass":"WARLOCK"},
+  {"id":"38585","name":"Ritual of C'Thun","cost":1,"cardClass":"WARLOCK"},
+  {"id":"38665","name":"Mindrot Subjugator","cost":5,"cardClass":"WARLOCK"},
+  {"id":"38342","name":"Darkest Depths","cost":2,"cardClass":"WARLOCK"},
+  {"id":"38658","name":"Ritual of Summoning","cost":2,"cardClass":"WARLOCK"},
+  // Warrior (전사)
+  {"id":"38671","name":"Setesh","cost":7,"cardClass":"WARRIOR"},
+  {"id":"38668","name":"Archaedas","cost":4,"cardClass":"WARRIOR"},
+  {"id":"38673","name":"Animator of Iron","cost":3,"cardClass":"WARRIOR"},
+  {"id":"38674","name":"Anvil of Reshaping","cost":2,"cardClass":"WARRIOR"},
+  {"id":"38675","name":"Brassknuckle Brawler","cost":8,"cardClass":"WARRIOR"},
+  {"id":"38676","name":"Forge of Origination","cost":3,"cardClass":"WARRIOR"},
+  {"id":"38677","name":"Show of Force","cost":2,"cardClass":"WARRIOR"},
+  {"id":"38679","name":"Tol'vir Vanguard","cost":2,"cardClass":"WARRIOR"},
+  {"id":"38341","name":"Chisel","cost":2,"cardClass":"WARRIOR"},
+  {"id":"38678","name":"Stone Gauntlet","cost":1,"cardClass":"WARRIOR"},
+  // Neutral (중립)
+  {"id":"38364","name":"N'Zoth, Dream's End","cost":15,"cardClass":"NEUTRAL"},
+  {"id":"38350","name":"C'Thun, Eye of the Empire","cost":10,"cardClass":"NEUTRAL"},
+  {"id":"38373","name":"Y'Shaarj, Titan Bane","cost":10,"cardClass":"NEUTRAL"},
+  {"id":"38370","name":"M.O.T.H.E.R.","cost":9,"cardClass":"NEUTRAL"},
+  {"id":"38362","name":"Mastermind Yogg-Saron","cost":9,"cardClass":"NEUTRAL"},
+  {"id":"38349","name":"Stone Trogg","cost":8,"cardClass":"NEUTRAL"},
+  {"id":"38690","name":"Frontline Ironborn","cost":5,"cardClass":"NEUTRAL"},
+  {"id":"38691","name":"Tome Translator","cost":4,"cardClass":"NEUTRAL"},
+  {"id":"38694","name":"Mogu Warmaster","cost":3,"cardClass":"NEUTRAL"},
+  {"id":"38695","name":"Proto-Pandaren","cost":2,"cardClass":"NEUTRAL"},
+  {"id":"38715","name":"Seeker of Prey","cost":7,"cardClass":"NEUTRAL"},
+  {"id":"38636","name":"Assimilating Ooze","cost":4,"cardClass":"NEUTRAL"},
+  {"id":"38365","name":"Spawn of C'Thun","cost":4,"cardClass":"NEUTRAL"},
+  {"id":"38630","name":"Shadewing","cost":2,"cardClass":"NEUTRAL"},
+  {"id":"38732","name":"Unstable Prototype","cost":1,"cardClass":"NEUTRAL"},
+  {"id":"38633","name":"Titanic Thrasher","cost":8,"cardClass":"NEUTRAL"},
+  {"id":"38713","name":"Power Tiger","cost":6,"cardClass":"NEUTRAL"},
+  {"id":"38584","name":"Gargantuan Slitherer","cost":6,"cardClass":"NEUTRAL"},
+  {"id":"38731","name":"OC91 Chariot","cost":5,"cardClass":"NEUTRAL"},
+  {"id":"38730","name":"Vaultkeeper","cost":5,"cardClass":"NEUTRAL"},
+  {"id":"38637","name":"Crystalline Golem","cost":4,"cardClass":"NEUTRAL"},
+  {"id":"38670","name":"Mantid Precursor","cost":3,"cardClass":"NEUTRAL"},
+  {"id":"38344","name":"F3TCH3R","cost":3,"cardClass":"NEUTRAL"},
+  {"id":"38662","name":"Bloatray","cost":1,"cardClass":"NEUTRAL"},
+  {"id":"38666","name":"Primordial Wyrm","cost":1,"cardClass":"NEUTRAL"},
+];
+
+function getBECards(hsMap = {}) {
+  return BE_CARDS_RAW.map(c => {
+    const id = String(c.id);
+    const hs = hsMap[id] || {};
+    return {
+      id,
+      name:      hs.name || c.name,
+      cost:      hs.cost ?? c.cost,
+      cardClass: hs.cardClass || c.cardClass || 'NEUTRAL',
+      imageUrl:  `https://art.hearthstonejson.com/v1/render/latest/koKR/256x/${id}.png`,
+      cropImage: '',
+    };
+  });
+}
+
+function getVHCards(hsMap = {}) {
+  return VH_CARDS_RAW.map(c => {
+    const id = String(c.id);
+    const hs = hsMap[id] || {};
+    const classId = VH_CLASS_MAP[id] ?? c.classId;
+    return {
+      id,
+      name:      hs.name || c.name,
+      cost:      hs.cost ?? c.cost,
+      cardClass: VH_CLASSID_TO_CLASS[classId] || 'NEUTRAL',  // 항상 VH_CLASS_MAP 기준
+      imageUrl:  VH_IMAGE_MAP[id] ? VH_BASE + VH_IMAGE_MAP[id] + '.png' : '',
+      cropImage: '',
+    };
+  });
+}
+let evaluators = ['나'];
+let cardsByExp = {};       // expId → cardData[]
+let selectedExpId = null;
+let cards = [];
+let currentFilter = 'all';
+
+// ── localStorage 저장/복원 ───────────────────────────────────
+const LS_KEY = 'hs_eval_v1';
+
+function saveState() {
+  try {
+    const evalData = {};
+    cards.forEach(c => { evalData[c.id] = c.evals; });
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      evaluators,
+      selectedExpId,
+      evalData,
+    }));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return {};
+    return JSON.parse(raw);
+  } catch(e) { return {}; }
+}
+
+// ── 초기화 ────────────────────────────────────────────────────
+function init() {
+  // localStorage에서 평가자 복원
+  const saved = loadState();
+  if (saved.evaluators?.length) evaluators = saved.evaluators;
+
+  buildSidebar();
+  renderArea();
+  renderChips();
+  loadCards(saved);
+}
+
+function buildSidebar() {
+  document.getElementById('classBtns').innerHTML = CLASS_ORDER.map(cl => `
+    <button class="sb-btn" onclick="setFilter('${cl.key}',this)">
+      <span class="sb-dot ${cl.cc}"></span>${cl.label}
+      <span class="sb-cnt" id="cnt-${cl.key}">0</span>
+    </button>`).join('');
+}
+
+// ── 데이터 로드 ───────────────────────────────────────────────
+// 블리자드 OAuth2 Client Credentials → 공식 API 사용
+// 실패 시 hearthstonejson으로 폴백
+const BNET_CLIENT_ID     = '60b3aff34c094097b7b3dd82ae3f7f1c';
+const BNET_CLIENT_SECRET = 'jGQBzMMBRUWjJ7lmciT2LpHX9d7UWB18';
+const BNET_TOKEN_URL     = 'https://oauth.battle.net/token';
+const BNET_REGION        = 'kr';
+const BNET_CARDS_API     = `https://${BNET_REGION}.api.blizzard.com/hearthstone/cards`;
+const BNET_LOCALE        = 'ko_KR';
+
+let _bnetToken = null;
+
+async function getBnetToken() {
+  if (_bnetToken && _bnetToken.expiresAt > Date.now()) return _bnetToken.access_token;
+  const cred = btoa(`${BNET_CLIENT_ID}:${BNET_CLIENT_SECRET}`);
+  const r = await fetch(BNET_TOKEN_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${cred}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'grant_type=client_credentials',
+  });
+  if (!r.ok) throw new Error(`토큰 발급 실패 HTTP ${r.status}`);
+  const data = await r.json();
+  _bnetToken = { access_token: data.access_token, expiresAt: Date.now() + (data.expires_in - 60) * 1000 };
+  return _bnetToken.access_token;
+}
+
+// 블리자드 API slug → hearthstonejson set 코드 매핑
+const SLUG_TO_SETCODE = {
+  'escape-from-violet-hold':   'ESCAPEFROM_VIOLET_HOLD',
+  'cataclysm':                 'CATACLYSM',
+  'across-the-timeways':       'TIME_TRAVEL',
+  'the-lost-city-of-ungoro':   'THE_LOST_CITY',
+  'into-the-emerald-dream':    'EMERALD_DREAM',
+  'reign-of-the-black-empire': 'BE',
+};
+
+// 블리자드 API로 확장팩 카드 목록 가져오기 (페이징 처리)
+async function fetchBnetCards(slug, token) {
+  let page = 1, all = [];
+  while (true) {
+    const url = `${BNET_CARDS_API}?locale=${BNET_LOCALE}&set=${slug}&pageSize=100&page=${page}`;
+    const r = await fetch(url, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json();
+    const cards = data.cards ?? [];
+    all = all.concat(cards);
+    if (page >= (data.pageCount ?? 1)) break;
+    page++;
+  }
+  return all;
+}
+
+async function loadCards(saved = {}) {
+  const st = document.getElementById('expStatus');
+  try {
+    st.textContent = '카드 데이터 불러오는 중…';
+    st.style.display = '';
+    st.style.color = '';
+
+    cardsByExp = {};
+
+    // ── 1. 블리자드 OAuth 토큰 발급 시도 ────────────────────────
+    let token = null;
+    try {
+      token = await getBnetToken();
+      console.log('블리자드 API 토큰 발급 성공');
+    } catch(e) {
+      console.warn('블리자드 토큰 발급 실패, hearthstonejson 폴백:', e.message);
+    }
+
+    // ── 2. hearthstonejson 보조 맵 (한글명 + 직업 보완용) ───────
+    let ko = [];
+    try {
+      const rKo = await fetch('https://api.hearthstonejson.com/v1/latest/koKR/cards.json');
+      if (rKo.ok) ko = await rKo.json();
+    } catch(e) {
+      console.warn('hearthstonejson 로드 실패, 하드코딩 데이터 사용:', e.message);
+    }
+    const hsMap = {}; // id → {cardClass, name, cost}
+    ko.forEach(c => {
+      if (c.id) hsMap[String(c.id)] = {
+        cardClass: (c.cardClass || 'NEUTRAL').toUpperCase(),
+        name: c.name || '',
+        cost: c.cost ?? 0,
+      };
+    });
+
+    if (token) {
+      // ── 3A. 블리자드 API 경로 ──────────────────────────────────
+      // VIOLET_HOLD는 API에 없으므로 하드코딩, 나머지는 API 호출
+      cardsByExp['VIOLET_HOLD'] = getVHCards(hsMap);
+
+      const apiExps = TARGET_EXPANSIONS.filter(e => e.id !== 'VIOLET_HOLD');
+      const results = await Promise.allSettled(
+        apiExps.map(exp => fetchBnetCards(exp.slug, token))
+      );
+
+      results.forEach((result, i) => {
+        const exp = apiExps[i];
+        const apiCards = result.status === 'fulfilled' ? result.value : [];
+
+        if (exp.id === 'BLACK_EMPIRE' && apiCards.length < 100) {
+          // 출시 전이라 API 데이터 없음 → 하드코딩 사용
+          cardsByExp[exp.id] = getBECards(hsMap);
+        } else if (apiCards.length > 0) {
+          cardsByExp[exp.id] = apiCards.map(c => {
+            const id = String(c.id);
+            const hs = hsMap[id] || {};
+            // 블리자드 API 카드 이미지 URL 구성
+            const blizzImgBase = `https://art.hearthstonejson.com/v1/render/latest/koKR/256x/${id}.png`;
+            return {
+              id,
+              name:      hs.name || c.name || '',
+              cost:      c.manaCost ?? hs.cost ?? 0,
+              cardClass: hs.cardClass || (c.multiClassGroup ? 'NEUTRAL' : (c.classId ? classIdToName(c.classId) : 'NEUTRAL')),
+              imageUrl:  c.image || blizzImgBase,
+              cropImage: c.cropImage || '',
+            };
+          });
+        } else {
+          cardsByExp[exp.id] = [];
+        }
+      });
+    } else {
+      // ── 3B. 블리자드 API 실패 → hearthstonejson 폴백 ──────────
+      const HARDCODED_SLUGS = new Set(['escape-from-violet-hold', 'reign-of-the-black-empire']);
+      const allSetCodes = new Set(
+        Object.entries(SLUG_TO_SETCODE)
+          .filter(([slug]) => !HARDCODED_SLUGS.has(slug))
+          .map(([, code]) => code)
+      );
+      const setCodeToExpId = {};
+      TARGET_EXPANSIONS.forEach(exp => {
+        setCodeToExpId[SLUG_TO_SETCODE[exp.slug]] = exp.id;
+      });
+      TARGET_EXPANSIONS.forEach(exp => { cardsByExp[exp.id] = []; });
+      cardsByExp['VIOLET_HOLD'] = getVHCards(hsMap);
+
+      // 검은 제국의 지배
+      const beFromAPI = ko.filter(c => c.collectible && c.name && c.type && c.set === 'BE');
+      if (beFromAPI.length >= 100) {
+        cardsByExp['BLACK_EMPIRE'] = beFromAPI.map(c => ({
+          id:        String(c.id),
+          name:      c.name,
+          cost:      c.cost ?? 0,
+          cardClass: (c.cardClass || 'NEUTRAL').toUpperCase(),
+          imageUrl:  `https://art.hearthstonejson.com/v1/render/latest/koKR/256x/${c.id}.png`,
+          cropImage: '',
+        }));
+      } else {
+        cardsByExp['BLACK_EMPIRE'] = getBECards(hsMap);
+      }
+
+      ko.filter(c => c.collectible && c.name && c.type && allSetCodes.has(c.set))
+        .forEach(c => {
+          const expId = setCodeToExpId[c.set];
+          if (expId) cardsByExp[expId].push({
+            id:        String(c.id),
+            name:      c.name,
+            cost:      c.cost ?? 0,
+            cardClass: (c.cardClass || 'NEUTRAL').toUpperCase(),
+            imageUrl:  `https://art.hearthstonejson.com/v1/render/latest/koKR/256x/${c.id}.png`,
+            cropImage: '',
+          });
+        });
+    }
+
+    renderExpGrid();
+    if (saved.selectedExpId) {
+      selectSet(saved.selectedExpId, saved.evalData || {});
+    }
+  } catch(e) {
+    st.textContent = `로딩 실패: ${e.message}`;
+    st.style.color = '#E87A7A';
+    st.style.display = '';
+    console.error('loadCards 에러:', e);
+  }
+}
+
+// 블리자드 API classId → 직업명 변환
+function classIdToName(id) {
+  const map = {1:'WARRIOR',2:'PALADIN',3:'HUNTER',4:'ROGUE',5:'PRIEST',
+                6:'SHAMAN',7:'MAGE',8:'WARLOCK',9:'DRUID',10:'DEMONHUNTER',
+                11:'DEATHKNIGHT',12:'MONK'};
+  return map[id] || 'NEUTRAL';
+}
+
+// ── 확장팩 그리드 렌더 ────────────────────────────────────────
+function renderExpGrid() {
+  const st = document.getElementById('expStatus');
+  st.style.display = 'none';
+
+  const grid = document.getElementById('expGrid');
+  grid.querySelectorAll('.exp-chip').forEach(el => el.remove());
+
+  TARGET_EXPANSIONS.forEach(exp => {
+    const count = cardsByExp[exp.id]?.length || 0;
+    const btn = document.createElement('button');
+    btn.className = 'exp-chip' + (selectedExpId === exp.id ? ' active' : '');
+    btn.title = exp.ko;
+    btn.innerHTML = `${exp.ko} <span style="opacity:.5;font-size:10px;">${count > 0 ? count+'장' : ''}</span>`;
+    btn.addEventListener('click', () => selectSet(exp.id));
+    grid.appendChild(btn);
+  });
+}
+
+// ── 확장팩 선택 ───────────────────────────────────────────────
+function selectSet(expId, savedEvalData = null) {
+  selectedExpId = expId;
+  const info = TARGET_EXPANSIONS.find(e => e.id === expId);
+
+  // 현재 카드 평가 보존 (확장팩 전환 시) 또는 localStorage에서 복원
+  const evalMap = savedEvalData || {};
+  if (!savedEvalData) cards.forEach(c => { evalMap[c.id] = c.evals; });
+
+  cards = (cardsByExp[expId] || [])
+    .map(c => ({
+      id:        c.id,
+      name:      c.name,
+      cost:      c.cost ?? 0,
+      cardClass: c.cardClass || 'NEUTRAL',
+      imageUrl:  c.imageUrl,   // 블리자드 cloudfront URL
+      cropImage: c.cropImage,
+      evals: evalMap[c.id] || evaluators.map(() => ({grade: GRADES[0], comment: ''})),
+    }))
+    .sort((a, b) => a.cost - b.cost || a.name.localeCompare(b.name, 'ko'));
+
+  document.getElementById('expSelLbl').textContent = info ? `✓ ${info.ko}` : '';
+  document.getElementById('expClearBtn').style.display = '';
+
+  document.querySelectorAll('.exp-chip').forEach(btn => {
+    btn.classList.toggle('active', btn.title === (info?.ko || ''));
+  });
+
+  updateCounts();
+  renderArea();
+  saveState();
+}
+
+function clearSet() {
+  selectedExpId = null;
+  cards = [];
+  document.getElementById('expSelLbl').textContent = '';
+  document.getElementById('expClearBtn').style.display = 'none';
+  document.querySelectorAll('.exp-chip').forEach(b => b.classList.remove('active'));
+  updateCounts();
+  renderArea();
+  saveState();
+}
+
+// ── 이미지 fallback ───────────────────────────────────────────
+function onImgErr(img, id, cropImage) {
+  const chain = [
+    cropImage, // 카드 아트 (작은 이미지)
+    `https://art.hearthstonejson.com/v1/render/latest/koKR/256x/${id}.png`,
+    `https://art.hearthstonejson.com/v1/render/latest/enUS/256x/${id}.png`,
+    `https://art.hearthstonejson.com/v1/render/latest/koKR/512x/${id}.png`,
+    `https://art.hearthstonejson.com/v1/render/latest/enUS/512x/${id}.png`,
+  ].filter(Boolean);
+  const i = parseInt(img.dataset.fb || '0');
+  if (i < chain.length) { img.dataset.fb = i + 1; img.src = chain[i]; }
+  else img.outerHTML = `<div class="card-img-placeholder"><span class="ph-ic">🃏</span><small>${id}</small></div>`;
+}
+
+// ── 평가자 ────────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('evalInput').value = '';
+  document.getElementById('modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('evalInput').focus(), 40);
+}
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+document.getElementById('evalInput').addEventListener('keydown', e => { if (e.key === 'Enter') confirmEval(); });
+
+function confirmEval() {
+  const name = document.getElementById('evalInput').value.trim();
+  if (!name) return;
+  evaluators.push(name);
+  cards.forEach(c => c.evals.push({grade: GRADES[0], comment: ''}));
+  closeModal();
+  renderAll();
+  saveState();
+}
+function removeEval(i) {
+  if (evaluators.length <= 1) { alert('최소 1명이 필요합니다.'); return; }
+  evaluators.splice(i, 1);
+  cards.forEach(c => c.evals.splice(i, 1));
+  renderAll();
+  saveState();
+}
+function onEvalNameChange(i, val) {
+  const name = val.trim();
+  if (!name) { renderChips(); return; }
+  evaluators[i] = name;
+  document.querySelectorAll(`.ev-name-${i}`).forEach(el => el.textContent = name);
+  saveState();
+}
+function renderChips() {
+  document.getElementById('evalChips').innerHTML = evaluators.map((e, i) => `
+    <div class="eval-chip">
+      <input class="eval-chip-name" type="text" value="${e}" title="클릭하여 이름 수정"
+        onchange="onEvalNameChange(${i},this.value)"
+        onblur="onEvalNameChange(${i},this.value)"
+        onkeydown="if(event.key==='Enter')this.blur()"/>
+      <button class="eval-chip-rm" onclick="removeEval(${i})">×</button>
+    </div>`).join('');
+}
+
+// ── 필터 ──────────────────────────────────────────────────────
+function setFilter(key, btn) {
+  currentFilter = key;
+  document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderArea();
+}
+function normClass(key) {
+  const k = (key || '').toUpperCase();
+  return CLASS_ORDER.find(c => c.key === k) ? k : 'NEUTRAL';
+}
+function getClsInfo(key) {
+  return CLASS_ORDER.find(c => c.key === normClass(key)) || CLASS_ORDER[11];
+}
+
+// ── 카운트 ────────────────────────────────────────────────────
+function updateCounts() {
+  document.getElementById('cnt-all').textContent = cards.length;
+  CLASS_ORDER.forEach(cl => {
+    const el = document.getElementById('cnt-' + cl.key);
+    if (el) el.textContent = cards.filter(c => normClass(c.cardClass) === cl.key).length;
+  });
+}
+
+// ── 데이터 변경 ───────────────────────────────────────────────
+const GRADE_COLORS = {'판도':'#C47B2A','좋음':'#2A7A3A','가능성':'#2A5AA0','가루':'#505050'};
+
+// body에 단일 드롭다운 생성
+const _dd = document.createElement('div');
+_dd.className = 'grade-dropdown';
+_dd.id = 'globalGradeDD';
+document.body.appendChild(_dd);
+
+let _ddTarget = null; // {ci, ei, btnId}
+
+function toggleGrade(btnId, ci, ei) {
+  const btn = document.getElementById(btnId);
+  const rect = btn.getBoundingClientRect();
+  const isOpen = _dd.classList.contains('open') && _ddTarget?.btnId === btnId;
+
+  closeGradeDD();
+  if (isOpen) return;
+
+  _ddTarget = {ci, ei, btnId};
+  _dd.innerHTML = GRADES.map(g => `
+    <div class="grade-opt" style="background:${GRADE_COLORS[g]}"
+      onmousedown="pickGrade(event,'${btnId}',${ci},${ei},'${g}')">
+      <span class="grade-opt-dot"></span>${g}
+    </div>`).join('');
+
+  // 버튼 아래 fixed 위치
+  _dd.style.top  = (rect.bottom + 2) + 'px';
+  _dd.style.left = rect.left + 'px';
+  _dd.classList.add('open');
+}
+
+function pickGrade(e, btnId, ci, ei, val) {
+  e.preventDefault();
+  e.stopPropagation();
+  const btn = document.getElementById(btnId);
+  if (btn) {
+    btn.className = `grade-btn grade-${val}`;
+    btn.innerHTML = `${val} <span style="font-size:10px;opacity:.8;">▾</span>`;
+  }
+  closeGradeDD();
+  cards[ci].evals[ei].grade = val;
+  saveState();
+}
+
+function closeGradeDD() {
+  _dd.classList.remove('open');
+  _ddTarget = null;
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.grade-btn') && !e.target.closest('#globalGradeDD')) {
+    closeGradeDD();
+  }
+});
+
+// textarea 코멘트 입력 — 이벤트 위임으로 처리 (oninput 인라인 대신)
+function handleCmtInput(e) {
+  const ta = e.target.closest('.cmt-inp');
+  if (!ta) return;
+  const ci = parseInt(ta.dataset.ci);
+  const ei = parseInt(ta.dataset.ei);
+  if (!isNaN(ci) && !isNaN(ei) && cards[ci]) {
+    cards[ci].evals[ei].comment = ta.value;
+    debounceSave();
+  }
+}
+document.addEventListener('input', handleCmtInput);
+document.addEventListener('compositionend', handleCmtInput);
+
+let _saveTimer = null;
+function debounceSave() {
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(saveState, 600);
+}
+
+// ── 렌더링 ────────────────────────────────────────────────────
+function renderAll() { renderChips(); updateCounts(); renderArea(); }
+
+function renderArea() {
+  renderChips();
+  const area = document.getElementById('cardsArea');
+
+  if (!selectedExpId) {
+    area.innerHTML = `<div class="empty"><span class="empty-ic">🃏</span>위에서 확장팩을 선택하면 카드가 자동으로 불러와집니다</div>`;
+    return;
+  }
+
+  const filtered = currentFilter === 'all'
+    ? cards
+    : cards.filter(c => normClass(c.cardClass) === currentFilter);
+
+  if (filtered.length === 0) {
+    area.innerHTML = `<div class="empty"><span class="empty-ic">🔍</span>이 직업의 카드가 없습니다</div>`;
+    return;
+  }
+
+  if (currentFilter === 'all') {
+    let html = '';
+    CLASS_ORDER.forEach(cl => {
+      const clCards = filtered.filter(c => normClass(c.cardClass) === cl.key);
+      if (!clCards.length) return;
+      html += `<div class="cls-sec">
+        <div class="cls-hdr">
+          <span class="cls-dot ${cl.cc}"></span>
+          <span class="cls-name">${cl.label}</span>
+          <span class="cls-cnt">${clCards.length}장</span>
+        </div>
+        <div class="card-grid">${clCards.map(card => renderCard(card, cards.indexOf(card))).join('')}</div>
+      </div>`;
+    });
+    area.innerHTML = html;
+  } else {
+    area.innerHTML = `<div class="card-grid">${filtered.map(card => renderCard(card, cards.indexOf(card))).join('')}</div>`;
+  }
+}
+
+function renderCard(card, ci) {
+  const evalBlocks = evaluators.map((ev, ei) => {
+    const ev_ = card.evals[ei] || {grade: GRADES[0], comment: ''};
+    const cur = ev_.grade || GRADES[0];
+    const btnId = `gb-${card.id}-${ei}`;
+
+    return `<div class="ev-block">
+      <div class="ev-row">
+        <div class="ev-name ev-name-${ei}">${ev}</div>
+        <div class="ev-grade">
+          <button class="grade-btn grade-${cur}" id="${btnId}"
+            onclick="toggleGrade('${btnId}',${ci},${ei})">
+            ${cur} <span style="font-size:10px;opacity:.8;">▾</span>
+          </button>
+        </div>
+      </div>
+      <div class="ev-comment">
+        <textarea class="cmt-inp" rows="3" placeholder="코멘트…"
+          data-ci="${ci}" data-ei="${ei}">${ev_.comment}</textarea>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="card-item">
+    <div class="card-img-wrap">
+      <img src="${card.imageUrl}" alt="${card.name}"
+        data-id="${card.id}" data-fb="0"
+        onerror="onImgErr(this,'${card.id}','${card.cropImage||''}')" loading="lazy"/>
+    </div>
+    <div class="card-title-bar">
+      <span class="card-title" title="${card.name}">${card.name}</span>
+    </div>
+    <div class="card-evals">${evalBlocks}</div>
+  </div>`;
+}
+
+// ── 저장 공통 ─────────────────────────────────────────────────
+function getAllOrdered() {
+  const out = [];
+  CLASS_ORDER.forEach(cl => cards.filter(c => normClass(c.cardClass) === cl.key).forEach(c => out.push(c)));
+  return out;
+}
+
+// ── 엑셀 ──────────────────────────────────────────────────────
+function exportExcel() {
+  if (!cards.length) { alert('카드가 없습니다.'); return; }
+  const info = TARGET_EXPANSIONS.find(e => e.id === selectedExpId);
+  const wb = XLSX.utils.book_new();
+  const makeRows = list => list.map(card => {
+    const row = {'카드 이름': card.name, '직업': getClsInfo(card.cardClass).label};
+    evaluators.forEach((ev, ei) => {
+      row[`${ev} 등급`] = card.evals[ei]?.grade || '';
+      row[`${ev} 코멘트`] = card.evals[ei]?.comment || '';
+    });
+    return row;
+  });
+  const ordered = getAllOrdered();
+  const name = info ? info.ko.slice(0, 28) : '전체';
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(makeRows(ordered)), '전체');
+  CLASS_ORDER.forEach(cl => {
+    const lst = ordered.filter(c => normClass(c.cardClass) === cl.key);
+    if (lst.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(makeRows(lst)), cl.label);
+  });
+  XLSX.writeFile(wb, `HS_평가_${name}.xlsx`);
+}
+
+// ── PDF ───────────────────────────────────────────────────────
+function exportPDF() {
+  if (!cards.length) { alert('카드가 없습니다.'); return; }
+  const info = TARGET_EXPANSIONS.find(e => e.id === selectedExpId);
+  const gBg = {'판도':'#C47B2A','좋음':'#2A7A3A','가능성':'#2A5AA0','가루':'#505050'};
+  const gTx = {'판도':'#fff',   '좋음':'#fff',    '가능성':'#fff',   '가루':'#fff'   };
+  const ordered = getAllOrdered();
+  let secs = '';
+  CLASS_ORDER.forEach(cl => {
+    const lst = ordered.filter(c => normClass(c.cardClass) === cl.key);
+    if (!lst.length) return;
+    const html = lst.map(card => {
+      const evHtml = evaluators.map((ev, ei) => {
+        const g = card.evals[ei]?.grade || '';
+        const cmt = card.evals[ei]?.comment || '';
+        return `<div style="border-bottom:1px solid #2a2010;padding:4px 6px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+            <span style="font-size:10px;font-weight:700;color:#C8A060;min-width:36px;">${ev}</span>
+            <span style="background:${gBg[g]||'#333'};color:${gTx[g]||'#ccc'};padding:1px 8px;border-radius:8px;font-size:9px;">${g}</span>
+          </div>
+          ${cmt ? `<div style="font-size:10px;color:#C8B898;padding-left:4px;">${cmt}</div>` : ''}
+        </div>`;
+      }).join('');
+      return `<div style="break-inside:avoid;margin-bottom:8px;background:#1e1609;border:1px solid #444;border-radius:8px;overflow:hidden;display:flex;">
+        <img src="${card.imageUrl}" style="width:80px;flex-shrink:0;display:block;object-fit:cover;"/>
+        <div style="flex:1;min-width:0;border-left:1px solid #333;">
+          <div style="padding:4px 6px;font-size:11px;font-weight:700;color:#F0E6D0;border-bottom:1px solid #333;">${card.name}</div>
+          ${evHtml}
+        </div>
+      </div>`;
+    }).join('');
+    secs += `<div style="margin-bottom:20px;"><h2 style="font-size:13px;font-weight:700;color:#C47B2A;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #444;">${cl.label} (${lst.length}장)</h2>${html}</div>`;
+  });
+  const title = info ? info.ko : '카드 평가표';
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
+  <style>body{background:#1A1208;color:#F0E6D0;font-family:sans-serif;padding:18px;margin:0;}h1{font-size:15px;color:#C47B2A;margin-bottom:14px;}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}</style>
+  </head><body><h1>🃏 ${title}</h1>${secs}<script>window.onload=()=>window.print();<\/script></body></html>`);
+  w.document.close();
+}
+
+// ── 시작 ──────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
