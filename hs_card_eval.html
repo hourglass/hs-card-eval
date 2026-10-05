@@ -679,11 +679,13 @@ async function loadCards(saved = {}) {
   }
 }
 
-// 블리자드 API classId → 직업명 변환
+// 블리자드 API classId → 직업명 변환 (metadata/classes 기준)
 function classIdToName(id) {
-  const map = {1:'WARRIOR',2:'PALADIN',3:'HUNTER',4:'ROGUE',5:'PRIEST',
-                6:'SHAMAN',7:'MAGE',8:'WARLOCK',9:'DRUID',10:'DEMONHUNTER',
-                11:'DEATHKNIGHT',12:'MONK'};
+  const map = {
+    1:'DEATHKNIGHT', 2:'DRUID',   3:'HUNTER',  4:'MAGE',
+    5:'PALADIN',     6:'PRIEST',  7:'ROGUE',   8:'SHAMAN',
+    9:'WARLOCK',    10:'WARRIOR', 12:'NEUTRAL', 14:'DEMONHUNTER',
+  };
   return map[id] || 'NEUTRAL';
 }
 
